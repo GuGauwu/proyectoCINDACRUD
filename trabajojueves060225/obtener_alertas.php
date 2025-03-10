@@ -1,8 +1,8 @@
 <?php
-// Incluir la conexión
+// llamara conexión
 require_once("conexión_oracle.php");
 
-// Preparar la llamada al procedimiento almacenado
+// Preparar la llamada
 $stid = oci_parse($conn, "BEGIN PKG_ALERTAS.Obt_Grid_Alertas(:p_registros); END;");
 
 
@@ -10,11 +10,11 @@ $stid = oci_parse($conn, "BEGIN PKG_ALERTAS.Obt_Grid_Alertas(:p_registros); END;
 $cursor = oci_new_cursor($conn);
 oci_bind_by_name($stid, ":p_registros", $cursor, -1, OCI_B_CURSOR);
 
-// Ejecutar el procedimiento
+// Ejecutar
 oci_execute($stid);
 oci_execute($cursor);
 
-// Leer los resultados
+// Leer
 $alertas = [];
 while ($fila = oci_fetch_assoc($cursor)) {
     $alertas[] = $fila; 
