@@ -19,3 +19,13 @@ $alertas = [];
 while ($fila = oci_fetch_assoc($cursor)) {
     $alertas[] = $fila; 
 }
+// Cerrar conexiones
+oci_free_statement($stid);
+oci_free_statement($cursor);
+oci_close($conn);
+
+// Mostrar los resultados en pantalla (para pruebas)
+echo "<pre>";
+print_r($alertas);
+echo "</pre>";
+?>
