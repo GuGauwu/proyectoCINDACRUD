@@ -4,7 +4,7 @@ $usuario = 'tu_usuario';
 $contrasena = 'tu_contrasena';
 $cadenaConexion = 'localhost/XE'; // recuerda cambiar el servicio
 
-// Conectar a Oracle
+// Conectar a Oracle 
 $conexion = oci_connect($usuario, $contrasena, $cadenaConexion);
 
 if (!$conexion) {
@@ -17,4 +17,3 @@ if (!$conexion) {
 // Cerrar conexión
 oci_close($conexion);
 ?>
-
