@@ -1,4 +1,5 @@
-<?php
+<a href="eliminar.php?id=<?php echo $fila['id']; ?>" onclick="return confirm('¿Estás seguro?')">Eliminar</a>
+<?
 // Conexión
 $conexion = new mysqli('localhost', 'root', '', 'bd_uni');
 
@@ -7,14 +8,14 @@ if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-// Verificar si se recibió 
-if (isset($_GET['matricula'])) {
-    $matricula = $_GET['matricula'];
+// Verificar si se recibió el ID
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $id = $_GET['id'];
 
-    // Preparar la consulta SQL para eliminar 
-    $query = "DELETE FROM matriculas WHERE matricula = ?";
+    // Preparar la consulta SQL para eliminar por ID
+    $query = "DELETE FROM matriculas WHERE id = ?";
     $stmt = $conexion->prepare($query);
-    $stmt->bind_param("s", $matricula);
+    $stmt->bind_param("i", $id);
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
@@ -27,7 +28,7 @@ if (isset($_GET['matricula'])) {
 
     $stmt->close();
 } else {
-    // Si no se recibió una matrícula válida, redireccionar con un error
+    // Si no se recibió un ID válido, redireccionar con un error
     header("Location: index1.php?delete_error=1");
 }
 

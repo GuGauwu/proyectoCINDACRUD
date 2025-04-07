@@ -2,184 +2,178 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabla de Matrícula</title>
+    <title>Gestión de Alertas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<?php if (isset($_GET['delete_success']) && $_GET['delete_success'] == 1): ?>
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-        <div id="toastDelete" class="toast show align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    🗑️ ¡Registro eliminado con éxito!
-                </div>
-                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-    <script>
-        setTimeout(() => {
-            let toast = document.getElementById('toastDelete');
-            if (toast) {
-                toast.classList.remove('show');
-            }
-        }, 4000); // 4 segundos
-    </script>
-<?php endif; ?>
-
-<?php if (isset($_GET['add_success']) && $_GET['add_success'] == 1): ?>
-    <!-- Modal de éxito para agregar -->
-    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="addModalLabel">Registro Exitoso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    ✅ <br>
-                    <h5 class="mt-2">¡Registro agregado con éxito!</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script para abrir el modal automáticamente -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var addModal = new bootstrap.Modal(document.getElementById('addModal'));
-            addModal.show();
-        });
-    </script>
-<?php endif; ?>
-
-
-    <div class="container mt-4">
-        <h2 class="text-center">Tabla de Matrícula</h2>
-        
-        <a href="modal.php" class="btn btn-primary mb-3">Buscar Alumno</a>
-        
-        <!-- Botón para abrir el modal -->
-        <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addModal">
-            Agregar Nuevo Registro
-        </button>
-
-        <!-- Modal para agregar nuevo registro -->
-        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addModalLabel">Agregar Nuevo Registro</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" action="agregar.php">
-                            <div class="mb-3">
-                                <label for="departamento" class="form-label">Departamento</label>
-                                <input type="text" class="form-control" id="departamento" name="departamento" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="matricula" class="form-label">Matrícula</label>
-                                <input type="text" class="form-control" id="matricula" name="matricula" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="semestre" class="form-label">Semestre</label>
-                                <input type="text" class="form-control" id="semestre" name="semestre" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="alerta" class="form-label">Alerta</label>
-                                <input type="text" class="form-control" id="alerta" name="alerta" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="estatus" class="form-label">Estatus</label>
-                                <select class="form-control" id="estatus" name="estatus" required>
-                                    <option value="Activo">Activo</option>
-                                    <option value="Inactivo">Inactivo</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Guardar</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tabla de datos -->
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Matrícula</th>
-                    <th>Departamento</th>
-                    <th>Semestre</th>
-                    <th>Alerta</th>
-                    <th>Estatus</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $conexion = new mysqli('localhost', 'root', '', 'bd_uni');
-                $query = "SELECT * FROM matriculas";
-                $resultado = $conexion->query($query);
-                while ($fila = $resultado->fetch_assoc()) {
-                    echo "<tr>";
-                    echo "<td>" . $fila['matricula'] . "</td>";
-                    echo "<td>" . $fila['departamento'] . "</td>";
-                    echo "<td>" . $fila['semestre'] . "</td>";
-                    echo "<td>" . $fila['alerta'] . "</td>";
-                    echo "<td>" . $fila['estatus'] . "</td>";
-                    echo "<td>
-                            <button class='btn btn-warning btn-sm'>Editar</button>
-                            <button class='btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteModal' data-id='" . $fila['matricula'] . "'>
-                                🗑️
+<body class="bg-light">
+<div class="container py-5">
+    <h1 class="mb-4">📋 Lista de Alertas</h1>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Matrícula</th>
+                <th>Departamento</th>
+                <th>Semestre</th>
+                <th>Alerta</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="alertaTableBody" class="text-center">
+            <?php
+            $json_data = file_get_contents('http://localhost/api/api.php');
+            $datos = json_decode($json_data, true);
+            foreach ($datos as $fila) {
+                $matricula = $fila['matricula'];
+                $departamento = $fila['departamento'];
+                $semestre = $fila['semestre'];
+                $alerta = $fila['alerta'];
+                $estatus = $fila['estatus'];
+                echo "
+                    <tr>
+                        <td>{$matricula}</td>
+                        <td>{$departamento}</td>
+                        <td>{$semestre}</td>
+                        <td>{$alerta}</td>
+                        <td>{$estatus}</td>
+                        <td>
+                            <button 
+                                class='btn btn-warning btn-sm' 
+                                data-bs-toggle='modal' 
+                                data-bs-target='#editModal'
+                                data-id='{$matricula}'
+                                data-departamento='{$departamento}'
+                                data-semestre='{$semestre}'
+                                data-alerta='{$alerta}'
+                                data-estatus='{$estatus}'>
+                                ✏️ Editar
                             </button>
-                          </td>";
-                    echo "</tr>";
-                }
-                $conexion->close();
-                ?>
-            </tbody>
-        </table>
-    </div>
+                            <button 
+                                class='btn btn-danger btn-sm' 
+                                data-bs-toggle='modal' 
+                                data-bs-target='#deleteModal'
+                                data-id='{$matricula}'>
+                                🗑️ Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                ";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
 
-    <!-- Modal de Confirmación de Eliminación -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Seguro que quieres eliminar este registro permanentemente?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Eliminar</a>
-                </div>
-            </div>
+<!-- Modal Editar -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="editForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Alerta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editId" name="matricula">
+        <div class="mb-3">
+          <label for="editDepartamento" class="form-label">Departamento</label>
+          <input type="text" class="form-control" id="editDepartamento" required>
         </div>
+        <div class="mb-3">
+          <label for="editSemestre" class="form-label">Semestre</label>
+          <input type="text" class="form-control" id="editSemestre" required>
+        </div>
+        <div class="mb-3">
+          <label for="editAlerta" class="form-label">Alerta</label>
+          <input type="text" class="form-control" id="editAlerta" required>
+        </div>
+        <div class="mb-3">
+          <label for="editEstatus" class="form-label">Estatus</label>
+          <select class="form-control" id="editEstatus" required>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminar Alerta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro que deseas eliminar esta alerta?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let deleteModal = document.getElementById("deleteModal");
-            deleteModal.addEventListener("show.bs.modal", function (event) {
-                let button = event.relatedTarget;
-                let matricula = button.getAttribute("data-id");
-                let confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-                confirmDeleteBtn.href = "eliminar.php?matricula=" + matricula;
-            });
-        });
-    </script>
+<script>
+    let deleteId = null;
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        deleteId = button.getAttribute('data-id');
+    });
+
+    document.getElementById('confirmDelete').addEventListener('click', function () {
+        fetch('http://localhost/api/eliminar.php', {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ matricula: deleteId })
+        })
+        .then(res => res.ok ? location.reload() : alert("Error al eliminar"))
+        .catch(err => console.error("Error en delete:", err));
+    });
+
+    const editModal = document.getElementById('editModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        document.getElementById('editId').value = button.getAttribute('data-id');
+        document.getElementById('editDepartamento').value = button.getAttribute('data-departamento');
+        document.getElementById('editSemestre').value = button.getAttribute('data-semestre');
+        document.getElementById('editAlerta').value = button.getAttribute('data-alerta');
+        document.getElementById('editEstatus').value = button.getAttribute('data-estatus');
+    });
+
+    document.getElementById('editForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const data = {
+            matricula: document.getElementById('editId').value,
+            departamento: document.getElementById('editDepartamento').value,
+            semestre: document.getElementById('editSemestre').value,
+            alerta: document.getElementById('editAlerta').value,
+            estatus: document.getElementById('editEstatus').value
+        };
+
+        fetch('http://localhost/api/modificar.php', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.ok ? location.reload() : alert("Error al actualizar"))
+        .catch(err => console.error("Error en fetch:", err));
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
