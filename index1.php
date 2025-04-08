@@ -20,46 +20,7 @@
             </tr>
         </thead>
         <tbody id="alertaTableBody" class="text-center">
-            <?php
-            $json_data = file_get_contents('http://localhost/api/api.php');
-            $datos = json_decode($json_data, true);
-            foreach ($datos as $fila) {
-                $matricula = $fila['matricula'];
-                $departamento = $fila['departamento'];
-                $semestre = $fila['semestre'];
-                $alerta = $fila['alerta'];
-                $estatus = $fila['estatus'];
-                echo "
-                    <tr>
-                        <td>{$matricula}</td>
-                        <td>{$departamento}</td>
-                        <td>{$semestre}</td>
-                        <td>{$alerta}</td>
-                        <td>{$estatus}</td>
-                        <td>
-                            <button 
-                                class='btn btn-warning btn-sm' 
-                                data-bs-toggle='modal' 
-                                data-bs-target='#editModal'
-                                data-id='{$matricula}'
-                                data-departamento='{$departamento}'
-                                data-semestre='{$semestre}'
-                                data-alerta='{$alerta}'
-                                data-estatus='{$estatus}'>
-                                ✏️ Editar
-                            </button>
-                            <button 
-                                class='btn btn-danger btn-sm' 
-                                data-bs-toggle='modal' 
-                                data-bs-target='#deleteModal'
-                                data-id='{$matricula}'>
-                                🗑️ Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                ";
-            }
-            ?>
+            <!-- Las filas serán insertadas aquí por JavaScript -->
         </tbody>
     </table>
 </div>
@@ -122,8 +83,48 @@
 </div>
 
 <script>
+    const tablaBody = document.getElementById('alertaTableBody');
     let deleteId = null;
 
+    function cargarAlertas() {
+        fetch('http://localhost/api/api.php')
+            .then(res => res.json())
+            .then(data => {
+                tablaBody.innerHTML = '';
+                data.forEach(fila => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fila.matricula}</td>
+                        <td>${fila.departamento}</td>
+                        <td>${fila.semestre}</td>
+                        <td>${fila.alerta}</td>
+                        <td>${fila.estatus}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editModal"
+                                data-id="${fila.matricula}"
+                                data-departamento="${fila.departamento}"
+                                data-semestre="${fila.semestre}"
+                                data-alerta="${fila.alerta}"
+                                data-estatus="${fila.estatus}">
+                                ✏️ Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteModal"
+                                data-id="${fila.matricula}">
+                                🗑️ Eliminar
+                            </button>
+                        </td>
+                    `;
+                    tablaBody.appendChild(tr);
+                });
+            })
+            .catch(err => console.error("Error al cargar alertas:", err));
+    }
+
+    // Modal eliminar
     const deleteModal = document.getElementById('deleteModal');
     deleteModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
@@ -140,6 +141,7 @@
         .catch(err => console.error("Error en delete:", err));
     });
 
+    // Modal editar
     const editModal = document.getElementById('editModal');
     editModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
@@ -172,6 +174,9 @@
         .then(res => res.ok ? location.reload() : alert("Error al actualizar"))
         .catch(err => console.error("Error en fetch:", err));
     });
+
+    // Cargar datos al inicio
+    document.addEventListener('DOMContentLoaded', cargarAlertas);
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
