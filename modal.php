@@ -67,12 +67,15 @@
                     <div class="flex mt-2">
                         <input type="text" id="matricula" placeholder="Escribe la matrícula" 
                                class="flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <button type="button" class="px-4 py-2 bg-indigo-600 text-white rounded-r-lg hover:bg-indigo-700 transition duration-200">
+                        <button type="button" id="btnBuscar" class="px-4 py-2 bg-indigo-600 text-white rounded-r-lg hover:bg-indigo-700 transition duration-200">
                             Buscar
                         </button>
                     </div>
                 </div>
             </form>
+
+            <!-- Contenedor de resultados -->
+            <div id="resultadoAlertas" class="mt-5"></div>
         </div>
     </div>
 
@@ -91,5 +94,8 @@
             document.getElementById('searchModal').classList.add('hidden');
         }
     </script>
+
+    <!-- Importar JS que hace fetch a obtener_alertas.php -->
+    <script src="fetch_alertas.js"></script>
 </body>
 </html>
