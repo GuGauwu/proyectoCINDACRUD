@@ -135,7 +135,7 @@
         fetch('http://localhost/api/eliminar.php', {
             method: 'DELETE',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ matricula: deleteId })
+            body: JSON.stringify({ id: deleteId })
         })
         .then(res => res.ok ? location.reload() : alert("Error al eliminar"))
         .catch(err => console.error("Error en delete:", err));
