@@ -1,36 +1,45 @@
-<a href="eliminar.php?id=<?php echo $fila['id']; ?>" onclick="return confirm('¿Estás seguro?')">Eliminar</a>
-<?
-// Conexión
-$conexion = new mysqli('localhost', 'root', '', 'bd_uni');
+<?php
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: DELETE");
+header("Access-Control-Allow-Headers: Content-Type");
 
-// Verificar
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
+// Verifica el método HTTP
+if ($_SERVER["REQUEST_METHOD"] !== "DELETE") {
+    http_response_code(405); // Método no permitido
+    echo json_encode(["error" => "Método no permitido"]);
+    exit();
 }
 
-// Verificar si se recibió el ID
-if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-    $id = $_GET['id'];
+// Leer datos JSON del cuerpo
+$data = json_decode(file_get_contents("php://input"), true);
 
-    // Preparar la consulta SQL para eliminar por ID
-    $query = "DELETE FROM matriculas WHERE id = ?";
-    $stmt = $conexion->prepare($query);
-    $stmt->bind_param("i", $id);
+// Validar que se haya enviado el ID
+if (!isset($data["id"]) || !is_numeric($data["id"])) {
+    http_response_code(400); // Solicitud incorrecta
+    echo json_encode(["error" => "ID inválido o faltante"]);
+    exit();
+}
 
-    // Ejecutar la consulta
-    if ($stmt->execute()) {
-        // Redirecciona con un mensaje de éxito
-        header("Location: index1.php?delete_success=1");
-    } else {
-        // Redirecciona con un mensaje de error
-        header("Location: index1.php?delete_error=1");
-    }
+// Conexión a la BD
+$conn = new mysqli("localhost", "root", "", "bd_uni");
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(["error" => "Error de conexión"]);
+    exit();
+}
 
-    $stmt->close();
+// Preparar y ejecutar la consulta
+$stmt = $conn->prepare("DELETE FROM matriculas WHERE id = ?");
+$stmt->bind_param("i", $data["id"]);
+
+if ($stmt->execute()) {
+    echo json_encode(["success" => true, "message" => "Registro eliminado"]);
 } else {
-    // Si no se recibió un ID válido, redireccionar con un error
-    header("Location: index1.php?delete_error=1");
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "No se pudo eliminar"]);
 }
 
-$conexion->close();
+$stmt->close();
+$conn->close();
 ?>
